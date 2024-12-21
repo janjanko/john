@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gender Prediction</title>
+    <link rel="manifest" href="manifest.json">
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        input {
+            padding: 10px;
+            font-size: 16px;
+            width: 80%;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            outline: none;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+            width: 85%;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .loading {
+            font-size: 16px;
+            color: #999;
+            margin-top: 10px;
+        }
+
+        .result {
+            background-color: #fafafa;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 5px;
+            display: none;
+            text-align: left;
+        }
+
+        .result p {
+            margin: 10px 0;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Gender Prediction</h1>
+        <input type="text" id="nameInput" placeholder="Enter name...">
+        <button onclick="fetchGender()">Predict Gender</button>
+        <div class="loading" id="loadingMessage" style="display:none;">Loading...</div>
+        <div class="result" id="result">
+            <p><strong>Predicted Gender:</strong> <span id="gender"></span></p>
+            <p><strong>Probability:</strong> <span id="probability"></span></p>
+        </div>
+    </div>
+
+    <script>
+        function fetchGender() {
+            const name = document.getElementById('nameInput').value.trim();
+
+            if (!name) {
+                alert("Please enter a name.");
+                return;
+            }
+
+            document.getElementById('loadingMessage').style.display = 'block';
+            document.getElementById('result').style.display = 'none';
+
+            const apiUrl = `https://api.genderize.io?name=${name}`;
+
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('loadingMessage').style.display = 'none';
+                    document.getElementById('result').style.display = 'block';
+
+                    const gender = data.gender ? data.gender : "Not available";
+                    const probability = data.probability ? (data.probability * 100).toFixed(2) + "%" : "Not available";
+
+                    document.getElementById('gender').textContent = gender;
+                    document.getElementById('probability').textContent = probability;
+                })
+                .catch(error => {
+                    document.getElementById('loadingMessage').style.display = 'none';
+                    document.getElementById('result').style.display = 'none';
+                    alert("Error fetching data.");
+                    console.error("Error fetching gender prediction:", error);
+                });
+        }
+    </script>
+    <script src="sw.js"></script>
+
+</body>
+</html>
